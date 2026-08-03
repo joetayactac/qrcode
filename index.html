@@ -618,8 +618,17 @@
     });
   });
 
+  document.querySelectorAll('.donate-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      fetch('https://api.countapi.xyz/hit/joetayactac-qrcode/coffee_clicks').catch(() => {});
+    });
+  });
+
   loadFromUrl();
   refresh();
+
+  // Simple, no-signup visit counter (CountAPI). Fails silently if offline/blocked.
+  fetch('https://api.countapi.xyz/hit/joetayactac-qrcode/visits').catch(() => {});
 </script>
 
 </body>
