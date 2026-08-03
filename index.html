@@ -370,12 +370,17 @@
     <div class="hero-left">
       <h1 class="headline">Welcome to Joe Tayatac</h1>
       <p class="sub" style="font-size:18px; color:var(--text); margin-bottom:8px;">Generate a QR code for your AppSheet app.</p>
-      <p class="sub">Pick a color and a size below, then copy the ready-made formula at the bottom of the page and paste it into your AppSheet column.</p>
+      <p class="sub">Type your column name, pick a color and a size, then copy the ready-made formula at the bottom of the page and paste it into your AppSheet column.</p>
 
       <div class="controls">
         <div class="field">
-          <label for="data">Encoded value</label>
-          <input type="text" id="data" value="Your Column Name" placeholder="URL, text, or a column like [ReferenceColumn]">
+          <label for="data">Column Name</label>
+          <input type="text" id="data" value="Vehicle No" placeholder="e.g. Vehicle No">
+        </div>
+
+        <div class="field" style="display:flex; align-items:center; gap:8px; flex-direction:row;">
+          <input type="checkbox" id="showValue" style="width:16px; height:16px; accent-color: var(--red); margin:0;">
+          <label for="showValue" style="margin:0; text-transform:none; font-family:'IBM Plex Sans', sans-serif; font-size:14px; letter-spacing:normal; color:var(--text);">Show value under the QR code</label>
         </div>
 
         <div class="row">
@@ -414,6 +419,7 @@
           <div class="qr-img-wrap">
             <img id="qrPreview" src="" alt="Live QR code preview" width="220" height="220">
           </div>
+          <div id="valueCaption" style="display:none; margin-top:12px; font-family:'IBM Plex Mono', monospace; font-size:14px; color:var(--text); text-align:center;"></div>
         </div>
         <div class="viewfinder-caption">
           <span>QR preview</span>
@@ -433,7 +439,10 @@
     </div>
     <button class="copy-btn" id="copyBtn">Copy formula</button>
     <p class="sub" style="margin-top:16px; margin-bottom:0; font-size:14px;">
-      Swap <code class="mono">[ReferenceColumn]</code> for whichever column in your AppSheet table holds the value you want turned into a QR code.
+      This formula already uses <strong>Column Name</strong> from above. Just make sure it matches the exact column name in your AppSheet table.
+    </p>
+    <p class="sub" style="margin-top:10px; margin-bottom:0; font-size:14px;">
+      To show the actual value under the QR code inside your AppSheet app, add that same column right below the Image column in your view — the image URL itself can't carry text.
     </p>
   </section>
 
@@ -445,7 +454,7 @@
           <tr><th>Param</th><th>Controls</th><th>Accepted values</th></tr>
         </thead>
         <tbody>
-          <tr><td class="param">data</td><td class="desc">The value encoded in the code</td><td class="vals">any text or URL, URL-encoded</td></tr>
+          <tr><td class="param">data</td><td class="desc">The column whose value becomes the QR code</td><td class="vals">your AppSheet column name</td></tr>
           <tr><td class="param">size</td><td class="desc">Image dimensions</td><td class="vals">e.g. 300x300 (max 1000x1000)</td></tr>
           <tr><td class="param">color</td><td class="desc">Foreground module color</td><td class="vals">hex, no # — e.g. 000000</td></tr>
           <tr><td class="param">bgcolor</td><td class="desc">Background color</td><td class="vals">hex, no # — e.g. ffffff</td></tr>
@@ -465,6 +474,8 @@
 
 <script>
   const dataInput = document.getElementById('data');
+  const showValue = document.getElementById('showValue');
+  const valueCaption = document.getElementById('valueCaption');
   const fg = document.getElementById('fg');
   const bg = document.getElementById('bg');
   const fgHex = document.getElementById('fgHex');
@@ -501,7 +512,8 @@
   function buildFormula(){
     const s = size.value;
     const params = `size=${s}x${s}&color=${stripHash(fg.value)}&bgcolor=${stripHash(bg.value)}&ecc=${DEFAULT_ECC}&qzone=${DEFAULT_QZONE}&data=`;
-    return `CONCATENATE(\n  "https://api.qrserver.com/v1/create-qr-code/?${params}",\n  ENCODEURL([ReferenceColumn])\n)`;
+    const columnName = (dataInput.value || 'ReferenceColumn').trim();
+    return `CONCATENATE(\n  "https://api.qrserver.com/v1/create-qr-code/?${params}",\n  ENCODEURL([${columnName}])\n)`;
   }
 
   function syntaxHighlight(formula){
@@ -549,6 +561,13 @@
     formulaOutput.innerHTML = syntaxHighlight(buildFormula());
     syncUrl();
 
+    if (showValue.checked && dataInput.value.trim()){
+      valueCaption.textContent = dataInput.value.trim();
+      valueCaption.style.display = 'block';
+    } else {
+      valueCaption.style.display = 'none';
+    }
+
     statusText.textContent = 'Updating...';
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
@@ -559,7 +578,7 @@
   qrPreview.addEventListener('load', () => { statusText.textContent = 'Ready'; });
   qrPreview.addEventListener('error', () => { statusText.textContent = 'Connection issue'; });
 
-  [dataInput, fg, bg, size].forEach(el => {
+  [dataInput, fg, bg, size, showValue].forEach(el => {
     el.addEventListener('input', refresh);
   });
 
@@ -579,4 +598,4 @@
 </script>
 
 </body>
-</html>
+</html>  
