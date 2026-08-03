@@ -68,6 +68,7 @@
   .topbar{
     display:flex; align-items:center; justify-content:space-between;
     padding: 18px 0;
+    gap: 16px;
   }
   .logo{
     display:flex; align-items:center; gap:10px;
@@ -92,6 +93,19 @@
   nav.links a{ text-decoration:none; transition: color .15s; }
   nav.links a:hover{ color: var(--text); }
   @media (max-width: 640px){ nav.links{ display:none; } }
+
+  .topbar-right{ display:flex; align-items:center; gap:18px; }
+
+  /* donate link — plain and simple, no button chrome */
+  .donate-btn{
+    text-decoration:none;
+    color: var(--red);
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 13px;
+    white-space: nowrap;
+    transition: opacity .15s;
+  }
+  .donate-btn:hover{ opacity:0.65; }
 
   /* ---------- HERO ---------- */
   .hero{
@@ -434,6 +448,9 @@
     <button class="copy-btn" id="copyBtn">Copy formula</button>
     <p class="sub" style="margin-top:16px; margin-bottom:0; font-size:14px;">
       This formula already uses <strong>Column Name</strong> from above. Just make sure it matches the exact column name in your AppSheet table.
+    </p>
+    <p style="margin-top:20px;">
+      <a href="https://paypal.me/Joemarietayactac1" target="_blank" rel="noopener" class="donate-btn">Donate</a>
     </p>
   </section>
 
