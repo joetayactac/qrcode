@@ -470,18 +470,6 @@
             <input type="range" id="size" min="100" max="600" step="10" value="300">
           </div>
         </div>
-
-        <div class="row barcode-only hidden">
-          <div class="field">
-            <label for="barcodeType">Barcode type</label>
-            <select id="barcodeType">
-              <option value="128">Code 128 (general purpose)</option>
-              <option value="39">Code 39</option>
-              <option value="13">EAN-13</option>
-              <option value="upca">UPC-A</option>
-            </select>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -545,7 +533,7 @@
         </thead>
         <tbody>
           <tr><td class="param">data</td><td class="desc">The column whose value becomes the barcode</td><td class="vals">your AppSheet column name</td></tr>
-          <tr><td class="param">type</td><td class="desc">Barcode symbology</td><td class="vals">128, 39, EAN-13, UPC-A</td></tr>
+          <tr><td class="param">type</td><td class="desc">Barcode symbology used</td><td class="vals">Code 128 (accepts any text or numbers)</td></tr>
         </tbody>
       </table>
     </div>
@@ -568,7 +556,6 @@
   const bgHex = document.getElementById('bgHex');
   const size = document.getElementById('size');
   const sizeReadout = document.getElementById('sizeReadout');
-  const barcodeType = document.getElementById('barcodeType');
   const qrPreview = document.getElementById('qrPreview');
   const statusText = document.getElementById('statusText');
   const previewLabel = document.getElementById('previewLabel');
@@ -628,9 +615,8 @@
       });
       return `${QR_BASE}?${params.toString()}`;
     }
-    const type = barcodeType.value;
     const value = encodeURIComponent(dataInput.value || 'SAMPLE123');
-    return `${BARCODE_BASE}/${type}/${value}`;
+    return `${BARCODE_BASE}/128/${value}`;
   }
 
   function buildFormula(){
@@ -640,8 +626,7 @@
       const params = `size=${s}x${s}&color=${stripHash(fg.value)}&bgcolor=${stripHash(bg.value)}&ecc=${DEFAULT_ECC}&qzone=${DEFAULT_QZONE}&data=`;
       return `CONCATENATE(\n  "https://api.qrserver.com/v1/create-qr-code/?${params}",\n  ENCODEURL([${columnName}])\n)`;
     }
-    const type = barcodeType.value;
-    return `CONCATENATE(\n  "https://barcodeapi.org/api/${type}/",\n  ENCODEURL([${columnName}])\n)`;
+    return `CONCATENATE(\n  "https://barcodeapi.org/api/128/",\n  ENCODEURL([${columnName}])\n)`;
   }
 
   function syntaxHighlight(formula){
@@ -652,7 +637,7 @@
   }
 
   // ---- URL param sync ----
-  // Reads ?format=&data=&color=&bgcolor=&size=&barcodeType= on load, and
+  // Reads ?format=&data=&color=&bgcolor=&size= on load, and
   // keeps the address bar in sync as settings change, so a configured
   // link is shareable.
   function loadFromUrl(){
@@ -667,7 +652,6 @@
       const s = parseInt(p.get('size'), 10);
       if (!isNaN(s)) size.value = Math.min(600, Math.max(100, s));
     }
-    if (p.has('barcodeType')) barcodeType.value = p.get('barcodeType');
   }
 
   function normalizeHex(v){
@@ -681,8 +665,7 @@
       data: dataInput.value || '',
       color: stripHash(fg.value),
       bgcolor: stripHash(bg.value),
-      size: size.value,
-      barcodeType: barcodeType.value
+      size: size.value
     });
     const newUrl = `${window.location.pathname}?${params.toString()}`;
     window.history.replaceState({}, '', newUrl);
@@ -706,7 +689,7 @@
   qrPreview.addEventListener('load', () => { statusText.textContent = 'Ready'; });
   qrPreview.addEventListener('error', () => { statusText.textContent = 'Connection issue'; });
 
-  [dataInput, fg, bg, size, barcodeType].forEach(el => {
+  [dataInput, fg, bg, size].forEach(el => {
     el.addEventListener('input', refresh);
   });
 
