@@ -302,9 +302,11 @@
   }
   .qr-img-wrap img{
     display:block;
-    width: 220px; height: 220px;
+    max-width: 100%;
     image-rendering: pixelated;
   }
+  .qr-img-wrap img.is-qr{ width: 220px; height: 220px; }
+  .qr-img-wrap img.is-barcode{ width: auto; height: auto; max-height: 140px; image-rendering: auto; }
 
   .viewfinder-caption{
     display:flex; justify-content:space-between; align-items:center;
@@ -470,6 +472,13 @@
             <input type="range" id="size" min="100" max="600" step="10" value="300">
           </div>
         </div>
+
+        <div class="row barcode-only hidden">
+          <div class="field">
+            <label for="barcodeScale">Size <span class="size-readout" id="barcodeScaleReadout">×2</span></label>
+            <input type="range" id="barcodeScale" min="1" max="5" step="1" value="2">
+          </div>
+        </div>
       </div>
     </div>
 
@@ -534,6 +543,7 @@
         <tbody>
           <tr><td class="param">data</td><td class="desc">The column whose value becomes the barcode</td><td class="vals">your AppSheet column name</td></tr>
           <tr><td class="param">type</td><td class="desc">Barcode symbology used</td><td class="vals">Code 128 (accepts any text or numbers)</td></tr>
+          <tr><td class="param">scale</td><td class="desc">Overall barcode size multiplier</td><td class="vals">1–5 (whole numbers)</td></tr>
         </tbody>
       </table>
     </div>
@@ -556,6 +566,8 @@
   const bgHex = document.getElementById('bgHex');
   const size = document.getElementById('size');
   const sizeReadout = document.getElementById('sizeReadout');
+  const barcodeScale = document.getElementById('barcodeScale');
+  const barcodeScaleReadout = document.getElementById('barcodeScaleReadout');
   const qrPreview = document.getElementById('qrPreview');
   const statusText = document.getElementById('statusText');
   const previewLabel = document.getElementById('previewLabel');
@@ -591,6 +603,8 @@
     document.querySelectorAll('.barcode-only').forEach(el => el.classList.toggle('hidden', isQr));
 
     previewLabel.textContent = isQr ? 'QR preview' : 'Barcode preview';
+    qrPreview.classList.toggle('is-qr', isQr);
+    qrPreview.classList.toggle('is-barcode', !isQr);
     pageIntro.textContent = isQr
       ? 'Generate a QR code for your AppSheet app.'
       : 'Generate a barcode for your AppSheet app.';
@@ -616,7 +630,7 @@
       return `${QR_BASE}?${params.toString()}`;
     }
     const value = encodeURIComponent(dataInput.value || 'SAMPLE123');
-    return `${BARCODE_BASE}/128/${value}`;
+    return `${BARCODE_BASE}/128/${value}?scale=${barcodeScale.value}`;
   }
 
   function buildFormula(){
@@ -626,7 +640,7 @@
       const params = `size=${s}x${s}&color=${stripHash(fg.value)}&bgcolor=${stripHash(bg.value)}&ecc=${DEFAULT_ECC}&qzone=${DEFAULT_QZONE}&data=`;
       return `CONCATENATE(\n  "https://api.qrserver.com/v1/create-qr-code/?${params}",\n  ENCODEURL([${columnName}])\n)`;
     }
-    return `CONCATENATE(\n  "https://barcodeapi.org/api/128/",\n  ENCODEURL([${columnName}])\n)`;
+    return `CONCATENATE(\n  "https://barcodeapi.org/api/128/",\n  ENCODEURL([${columnName}]),\n  "?scale=${barcodeScale.value}"\n)`;
   }
 
   function syntaxHighlight(formula){
@@ -652,6 +666,10 @@
       const s = parseInt(p.get('size'), 10);
       if (!isNaN(s)) size.value = Math.min(600, Math.max(100, s));
     }
+    if (p.has('barcodeScale')){
+      const bs = parseInt(p.get('barcodeScale'), 10);
+      if (!isNaN(bs)) barcodeScale.value = Math.min(5, Math.max(1, bs));
+    }
   }
 
   function normalizeHex(v){
@@ -665,7 +683,8 @@
       data: dataInput.value || '',
       color: stripHash(fg.value),
       bgcolor: stripHash(bg.value),
-      size: size.value
+      size: size.value,
+      barcodeScale: barcodeScale.value
     });
     const newUrl = `${window.location.pathname}?${params.toString()}`;
     window.history.replaceState({}, '', newUrl);
@@ -676,6 +695,7 @@
     fgHex.textContent = fg.value;
     bgHex.textContent = bg.value;
     sizeReadout.textContent = `${size.value} × ${size.value} px`;
+    barcodeScaleReadout.textContent = `×${barcodeScale.value}`;
     formulaOutput.innerHTML = syntaxHighlight(buildFormula());
     syncUrl();
 
@@ -689,7 +709,7 @@
   qrPreview.addEventListener('load', () => { statusText.textContent = 'Ready'; });
   qrPreview.addEventListener('error', () => { statusText.textContent = 'Connection issue'; });
 
-  [dataInput, fg, bg, size].forEach(el => {
+  [dataInput, fg, bg, size, barcodeScale].forEach(el => {
     el.addEventListener('input', refresh);
   });
 
