@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QR // GEN — Live QR Code Generator for AppSheet</title>
+<meta name="description" content="Generate scannable QR code image URLs for AppSheet virtual columns. Pick color, size, and error correction — copy a ready-made CONCATENATE formula.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #12151A;
+    --panel: #1B2029;
+    --panel-2: #20262f;
+    --line: #2A3140;
+    --text: #E7E9ED;
+    --muted: #8A93A6;
+    --red: #FF3B30;
+    --red-dim: #7a2420;
+    --cyan: #5EEAD4;
+    --radius: 4px;
+  }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  body{
+    margin:0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* background module texture */
+  body::before{
+    content:"";
+    position: fixed;
+    inset:0;
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(255,255,255,0.035) 1px, transparent 1px);
+    background-size: 22px 22px;
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .wrap{ max-width: 1180px; margin:0 auto; padding: 0 32px; position:relative; z-index:1; }
+
+  h1,h2,h3{ font-family:'Space Grotesk', sans-serif; margin:0; letter-spacing:-0.01em; }
+  code, .mono{ font-family:'IBM Plex Mono', monospace; }
+  a{ color:inherit; }
+
+  ::selection{ background: var(--red); color:#fff; }
+
+  :focus-visible{
+    outline: 2px solid var(--cyan);
+    outline-offset: 3px;
+  }
+
+  /* ---------- NAV ---------- */
+  header.top{
+    position: sticky; top:0; z-index:50;
+    background: rgba(18,21,26,0.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 18px 0;
+  }
+  .logo{
+    display:flex; align-items:center; gap:10px;
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:600; font-size:17px;
+    letter-spacing: 0.02em;
+  }
+  .logo .finder{
+    width:16px; height:16px;
+    border: 2.5px solid var(--red);
+    border-radius:2px;
+    position:relative;
+    flex-shrink:0;
+  }
+  .logo .finder::after{
+    content:"";
+    position:absolute; inset:4px;
+    background: var(--red);
+  }
+  .logo .slash{ color: var(--muted); font-weight:400; }
+  nav.links{ display:flex; gap:28px; font-size:14px; color: var(--muted); }
+  nav.links a{ text-decoration:none; transition: color .15s; }
+  nav.links a:hover{ color: var(--text); }
+  @media (max-width: 640px){ nav.links{ display:none; } }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    padding: 72px 0 56px;
+    display:grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 56px;
+    align-items:start;
+  }
+  @media (max-width: 900px){
+    .hero{ grid-template-columns: 1fr; padding: 44px 0 32px; gap: 40px; }
+  }
+
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px; letter-spacing: 0.08em;
+    color: var(--red);
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+  .eyebrow .dot{
+    width:6px; height:6px; background: var(--red); border-radius:50%;
+    animation: blink 1.6s ease-in-out infinite;
+  }
+  @keyframes blink{ 0%,100%{opacity:1;} 50%{opacity:0.25;} }
+
+  h1.headline{
+    font-size: clamp(32px, 4.2vw, 50px);
+    font-weight: 700;
+    line-height: 1.05;
+    margin-bottom: 18px;
+  }
+  h1.headline .accent{ color: var(--red); }
+
+  .sub{
+    color: var(--muted);
+    font-size: 16px;
+    max-width: 46ch;
+    margin-bottom: 32px;
+  }
+
+  /* controls */
+  .controls{ display:flex; flex-direction:column; gap:18px; }
+  .field label{
+    display:block; font-family:'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing:0.08em; text-transform:uppercase;
+    color: var(--muted); margin-bottom: 8px;
+  }
+  .field input[type="text"]{
+    width:100%;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--text);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:14px;
+    padding: 12px 14px;
+    border-radius: var(--radius);
+    transition: border-color .15s;
+  }
+  .field input[type="text"]:focus{ border-color: var(--red); outline:none; }
+  .field input[type="text"]::placeholder{ color:#525a6a; }
+
+  .row{ display:flex; gap:14px; flex-wrap:wrap; }
+  .row .field{ flex:1; min-width: 140px; }
+
+  .swatch-row{ display:flex; align-items:center; gap:10px; }
+  .swatch-row input[type="color"]{
+    -webkit-appearance:none; appearance:none;
+    width:40px; height:40px; padding:0; border:none;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    background:none; cursor:pointer;
+  }
+  .swatch-row input[type="color"]::-webkit-color-swatch-wrapper{ padding:2px; }
+  .swatch-row input[type="color"]::-webkit-color-swatch{ border-radius:2px; border:none; }
+  .hex-label{ font-family:'IBM Plex Mono', monospace; font-size:13px; color: var(--muted); }
+
+  select{
+    width:100%;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    color: var(--text);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:14px;
+    padding: 12px 14px;
+    border-radius: var(--radius);
+    cursor:pointer;
+  }
+  select:focus{ border-color: var(--red); outline:none; }
+
+  input[type="range"]{
+    width:100%; accent-color: var(--red);
+    height: 4px;
+  }
+  .size-readout{ font-family:'IBM Plex Mono', monospace; font-size:13px; color: var(--cyan); }
+
+  /* ---------- VIEWFINDER (QR preview) ---------- */
+  .viewfinder-outer{
+    position: sticky; top: 96px;
+  }
+  .viewfinder{
+    position: relative;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 40px;
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+    min-height: 340px;
+  }
+  .viewfinder .bracket{
+    position:absolute;
+    width: 34px; height: 34px;
+    border: 3px solid var(--red);
+  }
+  .viewfinder .bracket.tl{ top:14px; left:14px; border-right:none; border-bottom:none; }
+  .viewfinder .bracket.tr{ top:14px; right:14px; border-left:none; border-bottom:none; }
+  .viewfinder .bracket.bl{ bottom:14px; left:14px; border-right:none; border-top:none; }
+  /* fourth corner intentionally quiet-zoned, like a real QR finder layout */
+
+  .viewfinder .scanline{
+    position:absolute;
+    left: 14px; right: 14px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--red) 20%, var(--red) 80%, transparent);
+    box-shadow: 0 0 12px 1px var(--red);
+    animation: sweep 2.8s ease-in-out infinite;
+    opacity: 0.85;
+  }
+  @keyframes sweep{
+    0%{ top: 16px; }
+    50%{ top: calc(100% - 18px); }
+    100%{ top: 16px; }
+  }
+
+  .qr-img-wrap{
+    background:#fff;
+    padding: 14px;
+    border-radius: 4px;
+    line-height:0;
+  }
+  .qr-img-wrap img{
+    display:block;
+    width: 220px; height: 220px;
+    image-rendering: pixelated;
+  }
+
+  .viewfinder-caption{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-top:14px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12px; color: var(--muted);
+  }
+  .viewfinder-caption .status{ color: var(--cyan); }
+
+  /* ---------- FORMULA SECTION ---------- */
+  section.formula{ padding: 40px 0 64px; }
+  .section-label{
+    display:flex; align-items:center; gap:10px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px; letter-spacing:0.08em; text-transform:uppercase;
+    color: var(--muted);
+    margin-bottom: 18px;
+  }
+  .section-label .mark{
+    width:12px; height:12px; border:2px solid var(--cyan); position:relative; flex-shrink:0;
+  }
+  .section-label .mark::after{ content:""; position:absolute; inset:3px; background: var(--cyan); }
+
+  .terminal{
+    background: #0D0F13;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow:hidden;
+  }
+  .terminal-bar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel-2);
+  }
+  .terminal-bar .path{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--muted); }
+  .dots{ display:flex; gap:6px; }
+  .dots span{ width:9px; height:9px; border-radius:50%; background:#3a4152; }
+
+  .terminal-body{ padding: 22px 20px; }
+  .terminal-body pre{
+    margin:0;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 13.5px;
+    line-height:1.7;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .terminal-body pre .fn{ color: var(--cyan); }
+  .terminal-body pre .str{ color: #f2c078; }
+  .terminal-body pre .url{ color: var(--muted); }
+
+  .copy-btn{
+    margin-top: 16px;
+    display:inline-flex; align-items:center; gap:8px;
+    background: var(--red);
+    color:#fff;
+    border:none;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 13px; letter-spacing:0.03em;
+    padding: 11px 18px;
+    border-radius: var(--radius);
+    cursor:pointer;
+    transition: background .15s, transform .1s;
+  }
+  .copy-btn:hover{ background:#e6342a; }
+  .copy-btn:active{ transform: scale(0.98); }
+  .copy-btn.copied{ background: var(--cyan); color:#0D0F13; }
+
+  /* ---------- REFERENCE TABLE ---------- */
+  section.reference{ padding: 0 0 72px; }
+  .ref-table{
+    width:100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  .ref-table th{
+    text-align:left;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing:0.06em; text-transform:uppercase;
+    color: var(--muted);
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .ref-table td{
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  .ref-table td.param{ font-family:'IBM Plex Mono', monospace; color: var(--red); white-space:nowrap; }
+  .ref-table td.desc{ color: var(--text); }
+  .ref-table td.vals{ color: var(--muted); font-family:'IBM Plex Mono', monospace; font-size:13px; }
+  .ref-table tr:last-child td{ border-bottom:none; }
+  .ref-wrap{ overflow-x:auto; }
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    border-top: 1px solid var(--line);
+    padding: 28px 0;
+  }
+  .footer-row{
+    display:flex; justify-content:space-between; align-items:center;
+    font-size: 13px; color: var(--muted);
+    flex-wrap:wrap; gap:10px;
+  }
+  .footer-row .mono{ color: #525a6a; }
+
+  @media (prefers-reduced-motion: reduce){
+    .scanline{ animation: none; top:16px; }
+    .eyebrow .dot{ animation:none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap topbar">
+    <div class="logo"><span class="finder"></span>QR<span class="slash">&nbsp;//&nbsp;</span>GEN</div>
+    <nav class="links">
+      <a href="#generate">Generate</a>
+      <a href="#formula">AppSheet formula</a>
+      <a href="#reference">Parameters</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <section class="hero" id="generate">
+    <div class="hero-left">
+      <div class="eyebrow"><span class="dot"></span>Live image endpoint</div>
+      <h1 class="headline">Scan-ready QR codes,<br>as a <span class="accent">URL</span>.</h1>
+      <p class="sub">Set the color, size, and error correction below. The preview updates in real time — and every setting is baked straight into a formula you can paste into an AppSheet virtual column.</p>
+
+      <div class="controls">
+        <div class="field">
+          <label for="data">Encoded value</label>
+          <input type="text" id="data" value="https://joetayactac.github.io" placeholder="URL, text, or an AppSheet column like [WEB]">
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="fg">Foreground</label>
+            <div class="swatch-row">
+              <input type="color" id="fg" value="#000000">
+              <span class="hex-label" id="fgHex">#000000</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="bg">Background</label>
+            <div class="swatch-row">
+              <input type="color" id="bg" value="#ffffff">
+              <span class="hex-label" id="bgHex">#ffffff</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="ecc">Error correction</label>
+            <select id="ecc">
+              <option value="L">L — ~7% recovery</option>
+              <option value="M">M — ~15% recovery</option>
+              <option value="Q">Q — ~25% recovery</option>
+              <option value="H">H — ~30% recovery</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="size">Size <span class="size-readout" id="sizeReadout">300 × 300 px</span></label>
+            <input type="range" id="size" min="100" max="600" step="10" value="300">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="qzone">Quiet zone (margin)</label>
+            <input type="range" id="qzone" min="0" max="12" step="1" value="1">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="viewfinder-outer">
+        <div class="viewfinder">
+          <span class="bracket tl"></span>
+          <span class="bracket tr"></span>
+          <span class="bracket bl"></span>
+          <span class="scanline"></span>
+          <div class="qr-img-wrap">
+            <img id="qrPreview" src="" alt="Live QR code preview" width="220" height="220">
+          </div>
+        </div>
+        <div class="viewfinder-caption">
+          <span>viewfinder / live render</span>
+          <span class="status" id="statusText">● ready</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="formula" id="formula">
+    <div class="section-label"><span class="mark"></span>Use in AppSheet</div>
+    <div class="terminal">
+      <div class="terminal-bar">
+        <span class="path">virtual-column.formula</span>
+        <div class="dots"><span></span><span></span><span></span></div>
+      </div>
+      <div class="terminal-body">
+        <pre id="formulaOutput"></pre>
+      </div>
+    </div>
+    <button class="copy-btn" id="copyBtn">Copy formula</button>
+    <p class="sub" style="margin-top:16px; margin-bottom:0; font-size:14px;">
+      Paste this into an <strong>Image-type virtual column</strong>. Swap <code class="mono">[WEB]</code> for whichever column holds the value you want encoded — the formula wraps it in <code class="mono">ENCODEURL()</code> so spaces and special characters survive the trip.
+    </p>
+  </section>
+
+  <section class="reference" id="reference">
+    <div class="section-label"><span class="mark"></span>Parameter reference</div>
+    <div class="ref-wrap">
+      <table class="ref-table">
+        <thead>
+          <tr><th>Param</th><th>Controls</th><th>Accepted values</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="param">data</td><td class="desc">The value encoded in the code</td><td class="vals">any text or URL, URL-encoded</td></tr>
+          <tr><td class="param">size</td><td class="desc">Image dimensions</td><td class="vals">e.g. 300x300 (max 1000x1000)</td></tr>
+          <tr><td class="param">color</td><td class="desc">Foreground module color</td><td class="vals">hex, no # — e.g. 000000</td></tr>
+          <tr><td class="param">bgcolor</td><td class="desc">Background color</td><td class="vals">hex, no # — e.g. ffffff</td></tr>
+          <tr><td class="param">ecc</td><td class="desc">Error correction / recovery level</td><td class="vals">L, M, Q, H</td></tr>
+          <tr><td class="param">qzone</td><td class="desc">Quiet zone width around the code</td><td class="vals">0–100 (module units)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap footer-row">
+    <span>QR // GEN — a live QR image endpoint</span>
+    <span class="mono">built for AppSheet · joetayactac.github.io/qrcode</span>
+  </div>
+</footer>
+
+<script>
+  const dataInput = document.getElementById('data');
+  const fg = document.getElementById('fg');
+  const bg = document.getElementById('bg');
+  const fgHex = document.getElementById('fgHex');
+  const bgHex = document.getElementById('bgHex');
+  const ecc = document.getElementById('ecc');
+  const size = document.getElementById('size');
+  const sizeReadout = document.getElementById('sizeReadout');
+  const qzone = document.getElementById('qzone');
+  const qrPreview = document.getElementById('qrPreview');
+  const statusText = document.getElementById('statusText');
+  const formulaOutput = document.getElementById('formulaOutput');
+  const copyBtn = document.getElementById('copyBtn');
+
+  const BASE = 'https://api.qrserver.com/v1/create-qr-code/';
+
+  function stripHash(hex){ return hex.replace('#',''); }
+
+  function buildImageUrl(){
+    const s = size.value;
+    const params = new URLSearchParams({
+      size: `${s}x${s}`,
+      color: stripHash(fg.value),
+      bgcolor: stripHash(bg.value),
+      ecc: ecc.value,
+      qzone: qzone.value,
+      data: dataInput.value || ' '
+    });
+    return `${BASE}?${params.toString()}`;
+  }
+
+  function buildFormula(){
+    const s = size.value;
+    const params = `size=${s}x${s}&color=${stripHash(fg.value)}&bgcolor=${stripHash(bg.value)}&ecc=${ecc.value}&qzone=${qzone.value}&data=`;
+    return `CONCATENATE(\n  "https://api.qrserver.com/v1/create-qr-code/?${params}",\n  ENCODEURL([WEB])\n)`;
+  }
+
+  function syntaxHighlight(formula){
+    return formula
+      .replace(/CONCATENATE/g, '<span class="fn">CONCATENATE</span>')
+      .replace(/ENCODEURL/g, '<span class="fn">ENCODEURL</span>')
+      .replace(/"([^"]*)"/g, '<span class="str">"$1"</span>');
+  }
+
+  // ---- URL param sync ----
+  // Reads ?data=&color=&bgcolor=&size=&ecc=&qzone= on load, and keeps the
+  // address bar in sync as settings change, so a configured link is shareable.
+  function loadFromUrl(){
+    const p = new URLSearchParams(window.location.search);
+    if (p.has('data')) dataInput.value = p.get('data');
+    if (p.has('color')) fg.value = normalizeHex(p.get('color'));
+    if (p.has('bgcolor')) bg.value = normalizeHex(p.get('bgcolor'));
+    if (p.has('ecc') && ['L','M','Q','H'].includes(p.get('ecc').toUpperCase())){
+      ecc.value = p.get('ecc').toUpperCase();
+    }
+    if (p.has('size')){
+      const s = parseInt(p.get('size'), 10);
+      if (!isNaN(s)) size.value = Math.min(600, Math.max(100, s));
+    }
+    if (p.has('qzone')){
+      const q = parseInt(p.get('qzone'), 10);
+      if (!isNaN(q)) qzone.value = Math.min(12, Math.max(0, q));
+    }
+  }
+
+  function normalizeHex(v){
+    v = v.replace('#','').trim();
+    return /^[0-9a-fA-F]{6}$/.test(v) ? `#${v}` : fg.value;
+  }
+
+  function syncUrl(){
+    const params = new URLSearchParams({
+      data: dataInput.value || '',
+      color: stripHash(fg.value),
+      bgcolor: stripHash(bg.value),
+      ecc: ecc.value,
+      size: size.value,
+      qzone: qzone.value
+    });
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    window.history.replaceState({}, '', newUrl);
+  }
+
+  let debounceTimer;
+  function refresh(){
+    fgHex.textContent = fg.value;
+    bgHex.textContent = bg.value;
+    sizeReadout.textContent = `${size.value} × ${size.value} px`;
+    formulaOutput.innerHTML = syntaxHighlight(buildFormula());
+    syncUrl();
+
+    statusText.textContent = '● rendering';
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      qrPreview.src = buildImageUrl();
+    }, 250);
+  }
+
+  qrPreview.addEventListener('load', () => { statusText.textContent = '● ready'; });
+  qrPreview.addEventListener('error', () => { statusText.textContent = '● connection issue'; });
+
+  [dataInput, fg, bg, ecc, size, qzone].forEach(el => {
+    el.addEventListener('input', refresh);
+  });
+
+  copyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(buildFormula()).then(() => {
+      copyBtn.textContent = 'Copied ✓';
+      copyBtn.classList.add('copied');
+      setTimeout(() => {
+        copyBtn.textContent = 'Copy formula';
+        copyBtn.classList.remove('copied');
+      }, 1600);
+    });
+  });
+
+  loadFromUrl();
+  refresh();
+</script>
+
+</body>
+</html>
