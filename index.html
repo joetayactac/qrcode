@@ -378,11 +378,6 @@
           <input type="text" id="data" value="Vehicle No" placeholder="e.g. Vehicle No">
         </div>
 
-        <div class="field" style="display:flex; align-items:center; gap:8px; flex-direction:row;">
-          <input type="checkbox" id="showValue" style="width:16px; height:16px; accent-color: var(--red); margin:0;">
-          <label for="showValue" style="margin:0; text-transform:none; font-family:'IBM Plex Sans', sans-serif; font-size:14px; letter-spacing:normal; color:var(--text);">Show value under the QR code</label>
-        </div>
-
         <div class="row">
           <div class="field">
             <label for="fg">Foreground</label>
@@ -419,7 +414,6 @@
           <div class="qr-img-wrap">
             <img id="qrPreview" src="" alt="Live QR code preview" width="220" height="220">
           </div>
-          <div id="valueCaption" style="display:none; margin-top:12px; font-family:'IBM Plex Mono', monospace; font-size:14px; color:var(--text); text-align:center;"></div>
         </div>
         <div class="viewfinder-caption">
           <span>QR preview</span>
@@ -440,9 +434,6 @@
     <button class="copy-btn" id="copyBtn">Copy formula</button>
     <p class="sub" style="margin-top:16px; margin-bottom:0; font-size:14px;">
       This formula already uses <strong>Column Name</strong> from above. Just make sure it matches the exact column name in your AppSheet table.
-    </p>
-    <p class="sub" style="margin-top:10px; margin-bottom:0; font-size:14px;">
-      To show the actual value under the QR code inside your AppSheet app, add that same column right below the Image column in your view — the image URL itself can't carry text.
     </p>
   </section>
 
@@ -467,15 +458,13 @@
 
 <footer>
   <div class="wrap footer-row">
-    <span> QR CODE EXPRESSION GENERATOR — a live QR image endpoint</span>
+    <span>QR CODE EXPRESSION // GENERATOR — a live QR image endpoint</span>
     <span class="mono">built for AppSheet · joetayactac.github.io/qrcode</span>
   </div>
 </footer>
 
 <script>
   const dataInput = document.getElementById('data');
-  const showValue = document.getElementById('showValue');
-  const valueCaption = document.getElementById('valueCaption');
   const fg = document.getElementById('fg');
   const bg = document.getElementById('bg');
   const fgHex = document.getElementById('fgHex');
@@ -561,13 +550,6 @@
     formulaOutput.innerHTML = syntaxHighlight(buildFormula());
     syncUrl();
 
-    if (showValue.checked && dataInput.value.trim()){
-      valueCaption.textContent = dataInput.value.trim();
-      valueCaption.style.display = 'block';
-    } else {
-      valueCaption.style.display = 'none';
-    }
-
     statusText.textContent = 'Updating...';
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
@@ -578,7 +560,7 @@
   qrPreview.addEventListener('load', () => { statusText.textContent = 'Ready'; });
   qrPreview.addEventListener('error', () => { statusText.textContent = 'Connection issue'; });
 
-  [dataInput, fg, bg, size, showValue].forEach(el => {
+  [dataInput, fg, bg, size].forEach(el => {
     el.addEventListener('input', refresh);
   });
 
@@ -598,4 +580,4 @@
 </script>
 
 </body>
-</html>  
+</html>
