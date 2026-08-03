@@ -19,6 +19,7 @@
     --red: #E4002B;
     --red-dim: #FCE1E5;
     --cyan: #111111;
+    --youtube: #FF0000;
     --radius: 4px;
   }
 
@@ -94,7 +95,34 @@
   nav.links a:hover{ color: var(--text); }
   @media (max-width: 640px){ nav.links{ display:none; } }
 
-  .topbar-right{ display:flex; align-items:center; gap:18px; }
+  .topbar-right{ display:flex; align-items:center; gap:14px; }
+
+  /* YouTube channel button — placed in the sticky header so it's
+     visible at all times, styled with brand red and a play-icon mark */
+  .youtube-btn{
+    display:inline-flex; align-items:center; gap:8px;
+    text-decoration:none;
+    background: var(--youtube);
+    color:#fff;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 13px; font-weight:600; letter-spacing:0.02em;
+    padding: 9px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--youtube);
+    transition: background .15s, transform .1s, box-shadow .15s;
+    white-space: nowrap;
+    box-shadow: 0 2px 10px rgba(255,0,0,0.25);
+  }
+  .youtube-btn svg{ width:18px; height:18px; flex-shrink:0; }
+  .youtube-btn:hover{
+    background: #cc0000;
+    box-shadow: 0 4px 16px rgba(255,0,0,0.38);
+  }
+  .youtube-btn:active{ transform: scale(0.97); }
+  @media (max-width: 480px){
+    .youtube-btn span.label{ display:none; }
+    .youtube-btn{ padding:9px 11px; }
+  }
 
   /* buy-me-a-coffee — styled button with a bit of personality */
   .coffee-wrap{
@@ -415,6 +443,12 @@
     flex-wrap:wrap; gap:10px;
   }
   .footer-row .mono{ color: #525a6a; }
+  .footer-row .youtube-link{
+    display:inline-flex; align-items:center; gap:6px;
+    text-decoration:none; color: var(--youtube); font-weight:600;
+  }
+  .footer-row .youtube-link svg{ width:14px; height:14px; }
+  .footer-row .youtube-link:hover{ text-decoration:underline; }
 
   @media (prefers-reduced-motion: reduce){
     .scanline{ animation: none; top:16px; }
@@ -427,6 +461,12 @@
 <header class="top">
   <div class="wrap topbar">
     <div class="logo"><span class="finder"></span>QR<span class="slash">&nbsp;//&nbsp;</span>BARCODE</div>
+    <div class="topbar-right">
+      <a href="https://www.youtube.com/@JoeTayactac" target="_blank" rel="noopener" class="youtube-btn" aria-label="Subscribe to Joe Tayactac on YouTube">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.14C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.38.56A3.02 3.02 0 0 0 .5 6.2 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.8 3.02 3.02 0 0 0 2.12 2.14C4.5 20.5 12 20.5 12 20.5s7.5 0 9.38-.56a3.02 3.02 0 0 0 2.12-2.14A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.8ZM9.6 15.5v-7l6.4 3.5-6.4 3.5Z"/></svg>
+        <span class="label">Joe Tayactac on YouTube</span>
+      </a>
+    </div>
   </div>
 </header>
 
@@ -512,6 +552,10 @@
         Buy me a coffee
       </a>
       <span class="coffee-note">this formula runs on caffeine, not magic</span>
+      <a href="https://www.youtube.com/@JoeTayactac" target="_blank" rel="noopener" class="youtube-btn">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.14C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.38.56A3.02 3.02 0 0 0 .5 6.2 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.8 3.02 3.02 0 0 0 2.12 2.14C4.5 20.5 12 20.5 12 20.5s7.5 0 9.38-.56a3.02 3.02 0 0 0 2.12-2.14A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.8ZM9.6 15.5v-7l6.4 3.5-6.4 3.5Z"/></svg>
+        Subscribe on YouTube
+      </a>
     </div>
   </section>
 
@@ -546,6 +590,10 @@
 <footer>
   <div class="wrap footer-row">
     <span>QR &amp; BARCODE // GENERATOR — live QR and barcode image endpoints</span>
+    <a href="https://www.youtube.com/@JoeTayactac" target="_blank" rel="noopener" class="youtube-link">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.14C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.38.56A3.02 3.02 0 0 0 .5 6.2 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.8 3.02 3.02 0 0 0 2.12 2.14C4.5 20.5 12 20.5 12 20.5s7.5 0 9.38-.56a3.02 3.02 0 0 0 2.12-2.14A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.8ZM9.6 15.5v-7l6.4 3.5-6.4 3.5Z"/></svg>
+      Joe Tayactac on YouTube
+    </a>
     <span class="mono">built for AppSheet · joetayactac.github.io/qrcode</span>
   </div>
 </footer>
@@ -725,4 +773,4 @@
 </script>
 
 </body>
-</html>  
+</html>
