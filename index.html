@@ -3,22 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QR // GEN — Live QR Code Generator for AppSheet</title>
-<meta name="description" content="Generate scannable QR code image URLs for AppSheet virtual columns. Pick color, size, and error correction — copy a ready-made CONCATENATE formula.">
+<title>Welcome to Joe Tayatac — Generate a QR Code Formula for AppSheet</title>
+<meta name="description" content="Generate a QR code for your AppSheet app. Pick a color and size, then copy a ready-made formula.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #12151A;
-    --panel: #1B2029;
-    --panel-2: #20262f;
-    --line: #2A3140;
-    --text: #E7E9ED;
-    --muted: #8A93A6;
-    --red: #FF3B30;
-    --red-dim: #7a2420;
-    --cyan: #5EEAD4;
+    --bg: #FFFFFF;
+    --panel: #FFFFFF;
+    --panel-2: #F7F7F7;
+    --line: rgba(0,0,0,0.14);
+    --text: #111111;
+    --muted: rgba(0,0,0,0.55);
+    --red: #E4002B;
+    --red-dim: #FCE1E5;
+    --cyan: #111111;
     --radius: 4px;
   }
 
@@ -39,7 +39,7 @@
     position: fixed;
     inset:0;
     background-image:
-      radial-gradient(circle at 1px 1px, rgba(255,255,255,0.035) 1px, transparent 1px);
+      radial-gradient(circle at 1px 1px, rgba(20,22,26,0.06) 1px, transparent 1px);
     background-size: 22px 22px;
     pointer-events:none;
     z-index:0;
@@ -61,7 +61,7 @@
   /* ---------- NAV ---------- */
   header.top{
     position: sticky; top:0; z-index:50;
-    background: rgba(18,21,26,0.85);
+    background: rgba(250,250,249,0.85);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--line);
   }
@@ -202,6 +202,7 @@
     display:flex; align-items:center; justify-content:center;
     overflow:hidden;
     min-height: 340px;
+    box-shadow: 0 1px 2px rgba(20,22,26,0.04), 0 8px 24px rgba(20,22,26,0.05);
   }
   .viewfinder .bracket{
     position:absolute;
@@ -233,6 +234,7 @@
     padding: 14px;
     border-radius: 4px;
     line-height:0;
+    border: 1px solid var(--line);
   }
   .qr-img-wrap img{
     display:block;
@@ -263,18 +265,19 @@
   .section-label .mark::after{ content:""; position:absolute; inset:3px; background: var(--cyan); }
 
   .terminal{
-    background: #0D0F13;
+    background: #14161A;
     border: 1px solid var(--line);
     border-radius: 8px;
     overflow:hidden;
+    box-shadow: 0 1px 2px rgba(20,22,26,0.04), 0 8px 24px rgba(20,22,26,0.05);
   }
   .terminal-bar{
     display:flex; align-items:center; justify-content:space-between;
     padding: 10px 16px;
-    border-bottom: 1px solid var(--line);
-    background: var(--panel-2);
+    border-bottom: 1px solid #262a33;
+    background: #1B1E24;
   }
-  .terminal-bar .path{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--muted); }
+  .terminal-bar .path{ font-family:'IBM Plex Mono', monospace; font-size:12px; color:#8A93A6; }
   .dots{ display:flex; gap:6px; }
   .dots span{ width:9px; height:9px; border-radius:50%; background:#3a4152; }
 
@@ -284,13 +287,13 @@
     font-family:'IBM Plex Mono', monospace;
     font-size: 13.5px;
     line-height:1.7;
-    color: var(--text);
+    color: #E7E9ED;
     white-space: pre-wrap;
     word-break: break-all;
   }
-  .terminal-body pre .fn{ color: var(--cyan); }
+  .terminal-body pre .fn{ color: #5EEAD4; }
   .terminal-body pre .str{ color: #f2c078; }
-  .terminal-body pre .url{ color: var(--muted); }
+  .terminal-body pre .url{ color: #8A93A6; }
 
   .copy-btn{
     margin-top: 16px;
@@ -358,11 +361,6 @@
 <header class="top">
   <div class="wrap topbar">
     <div class="logo"><span class="finder"></span>QR<span class="slash">&nbsp;//&nbsp;</span>GEN</div>
-    <nav class="links">
-      <a href="#generate">Generate</a>
-      <a href="#formula">AppSheet formula</a>
-      <a href="#reference">Parameters</a>
-    </nav>
   </div>
 </header>
 
@@ -370,14 +368,14 @@
 
   <section class="hero" id="generate">
     <div class="hero-left">
-      <div class="eyebrow"><span class="dot"></span>Live image endpoint</div>
-      <h1 class="headline">Scan-ready QR codes,<br>as a <span class="accent">URL</span>.</h1>
-      <p class="sub">Set the color, size, and error correction below. The preview updates in real time — and every setting is baked straight into a formula you can paste into an AppSheet virtual column.</p>
+      <h1 class="headline">Welcome to Joe Tayatac</h1>
+      <p class="sub" style="font-size:18px; color:var(--text); margin-bottom:8px;">Generate a QR code for your AppSheet app.</p>
+      <p class="sub">Pick a color and a size below, then copy the ready-made formula at the bottom of the page and paste it into your AppSheet column.</p>
 
       <div class="controls">
         <div class="field">
           <label for="data">Encoded value</label>
-          <input type="text" id="data" value="https://joetayactac.github.io" placeholder="URL, text, or an AppSheet column like [WEB]">
+          <input type="text" id="data" value="Your Column Name" placeholder="URL, text, or a column like [ReferenceColumn]">
         </div>
 
         <div class="row">
@@ -399,24 +397,8 @@
 
         <div class="row">
           <div class="field">
-            <label for="ecc">Error correction</label>
-            <select id="ecc">
-              <option value="L">L — ~7% recovery</option>
-              <option value="M">M — ~15% recovery</option>
-              <option value="Q">Q — ~25% recovery</option>
-              <option value="H">H — ~30% recovery</option>
-            </select>
-          </div>
-          <div class="field">
             <label for="size">Size <span class="size-readout" id="sizeReadout">300 × 300 px</span></label>
             <input type="range" id="size" min="100" max="600" step="10" value="300">
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="field">
-            <label for="qzone">Quiet zone (margin)</label>
-            <input type="range" id="qzone" min="0" max="12" step="1" value="1">
           </div>
         </div>
       </div>
@@ -434,27 +416,24 @@
           </div>
         </div>
         <div class="viewfinder-caption">
-          <span>viewfinder / live render</span>
-          <span class="status" id="statusText">● ready</span>
+          <span>QR preview</span>
+          <span class="status" id="statusText">Ready</span>
         </div>
       </div>
     </div>
   </section>
 
   <section class="formula" id="formula">
-    <div class="section-label"><span class="mark"></span>Use in AppSheet</div>
+    <h2 style="font-family:'Space Grotesk', sans-serif; font-size:22px; margin-bottom:16px;">Your formula</h2>
+    <p class="sub" style="margin-bottom:16px;">Copy this and paste it into an <strong>Image-type virtual column</strong> in AppSheet.</p>
     <div class="terminal">
-      <div class="terminal-bar">
-        <span class="path">virtual-column.formula</span>
-        <div class="dots"><span></span><span></span><span></span></div>
-      </div>
       <div class="terminal-body">
         <pre id="formulaOutput"></pre>
       </div>
     </div>
     <button class="copy-btn" id="copyBtn">Copy formula</button>
     <p class="sub" style="margin-top:16px; margin-bottom:0; font-size:14px;">
-      Paste this into an <strong>Image-type virtual column</strong>. Swap <code class="mono">[WEB]</code> for whichever column holds the value you want encoded — the formula wraps it in <code class="mono">ENCODEURL()</code> so spaces and special characters survive the trip.
+      Swap <code class="mono">[ReferenceColumn]</code> for whichever column in your AppSheet table holds the value you want turned into a QR code.
     </p>
   </section>
 
@@ -470,8 +449,6 @@
           <tr><td class="param">size</td><td class="desc">Image dimensions</td><td class="vals">e.g. 300x300 (max 1000x1000)</td></tr>
           <tr><td class="param">color</td><td class="desc">Foreground module color</td><td class="vals">hex, no # — e.g. 000000</td></tr>
           <tr><td class="param">bgcolor</td><td class="desc">Background color</td><td class="vals">hex, no # — e.g. ffffff</td></tr>
-          <tr><td class="param">ecc</td><td class="desc">Error correction / recovery level</td><td class="vals">L, M, Q, H</td></tr>
-          <tr><td class="param">qzone</td><td class="desc">Quiet zone width around the code</td><td class="vals">0–100 (module units)</td></tr>
         </tbody>
       </table>
     </div>
@@ -492,16 +469,19 @@
   const bg = document.getElementById('bg');
   const fgHex = document.getElementById('fgHex');
   const bgHex = document.getElementById('bgHex');
-  const ecc = document.getElementById('ecc');
   const size = document.getElementById('size');
   const sizeReadout = document.getElementById('sizeReadout');
-  const qzone = document.getElementById('qzone');
   const qrPreview = document.getElementById('qrPreview');
   const statusText = document.getElementById('statusText');
   const formulaOutput = document.getElementById('formulaOutput');
   const copyBtn = document.getElementById('copyBtn');
 
   const BASE = 'https://api.qrserver.com/v1/create-qr-code/';
+
+  // Fixed, sensible defaults — not shown in the form since most people
+  // never need to change these.
+  const DEFAULT_ECC = 'L';
+  const DEFAULT_QZONE = '1';
 
   function stripHash(hex){ return hex.replace('#',''); }
 
@@ -511,8 +491,8 @@
       size: `${s}x${s}`,
       color: stripHash(fg.value),
       bgcolor: stripHash(bg.value),
-      ecc: ecc.value,
-      qzone: qzone.value,
+      ecc: DEFAULT_ECC,
+      qzone: DEFAULT_QZONE,
       data: dataInput.value || ' '
     });
     return `${BASE}?${params.toString()}`;
@@ -520,35 +500,28 @@
 
   function buildFormula(){
     const s = size.value;
-    const params = `size=${s}x${s}&color=${stripHash(fg.value)}&bgcolor=${stripHash(bg.value)}&ecc=${ecc.value}&qzone=${qzone.value}&data=`;
-    return `CONCATENATE(\n  "https://api.qrserver.com/v1/create-qr-code/?${params}",\n  ENCODEURL([WEB])\n)`;
+    const params = `size=${s}x${s}&color=${stripHash(fg.value)}&bgcolor=${stripHash(bg.value)}&ecc=${DEFAULT_ECC}&qzone=${DEFAULT_QZONE}&data=`;
+    return `CONCATENATE(\n  "https://api.qrserver.com/v1/create-qr-code/?${params}",\n  ENCODEURL([ReferenceColumn])\n)`;
   }
 
   function syntaxHighlight(formula){
     return formula
-      .replace(/CONCATENATE/g, '<span class="fn">CONCATENATE</span>')
-      .replace(/ENCODEURL/g, '<span class="fn">ENCODEURL</span>')
-      .replace(/"([^"]*)"/g, '<span class="str">"$1"</span>');
+      .replace(/"([^"]*)"/g, "<span class='str'>\"$1\"</span>")
+      .replace(/CONCATENATE/g, "<span class='fn'>CONCATENATE</span>")
+      .replace(/ENCODEURL/g, "<span class='fn'>ENCODEURL</span>");
   }
 
   // ---- URL param sync ----
-  // Reads ?data=&color=&bgcolor=&size=&ecc=&qzone= on load, and keeps the
-  // address bar in sync as settings change, so a configured link is shareable.
+  // Reads ?data=&color=&bgcolor=&size= on load, and keeps the address bar
+  // in sync as settings change, so a configured link is shareable.
   function loadFromUrl(){
     const p = new URLSearchParams(window.location.search);
     if (p.has('data')) dataInput.value = p.get('data');
     if (p.has('color')) fg.value = normalizeHex(p.get('color'));
     if (p.has('bgcolor')) bg.value = normalizeHex(p.get('bgcolor'));
-    if (p.has('ecc') && ['L','M','Q','H'].includes(p.get('ecc').toUpperCase())){
-      ecc.value = p.get('ecc').toUpperCase();
-    }
     if (p.has('size')){
       const s = parseInt(p.get('size'), 10);
       if (!isNaN(s)) size.value = Math.min(600, Math.max(100, s));
-    }
-    if (p.has('qzone')){
-      const q = parseInt(p.get('qzone'), 10);
-      if (!isNaN(q)) qzone.value = Math.min(12, Math.max(0, q));
     }
   }
 
@@ -562,9 +535,7 @@
       data: dataInput.value || '',
       color: stripHash(fg.value),
       bgcolor: stripHash(bg.value),
-      ecc: ecc.value,
-      size: size.value,
-      qzone: qzone.value
+      size: size.value
     });
     const newUrl = `${window.location.pathname}?${params.toString()}`;
     window.history.replaceState({}, '', newUrl);
@@ -578,17 +549,17 @@
     formulaOutput.innerHTML = syntaxHighlight(buildFormula());
     syncUrl();
 
-    statusText.textContent = '● rendering';
+    statusText.textContent = 'Updating...';
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
       qrPreview.src = buildImageUrl();
     }, 250);
   }
 
-  qrPreview.addEventListener('load', () => { statusText.textContent = '● ready'; });
-  qrPreview.addEventListener('error', () => { statusText.textContent = '● connection issue'; });
+  qrPreview.addEventListener('load', () => { statusText.textContent = 'Ready'; });
+  qrPreview.addEventListener('error', () => { statusText.textContent = 'Connection issue'; });
 
-  [dataInput, fg, bg, ecc, size, qzone].forEach(el => {
+  [dataInput, fg, bg, size].forEach(el => {
     el.addEventListener('input', refresh);
   });
 
