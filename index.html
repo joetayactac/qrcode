@@ -630,7 +630,10 @@
       const params = `size=${s}x${s}&color=${stripHash(fg.value)}&bgcolor=${stripHash(bg.value)}&ecc=${DEFAULT_ECC}&qzone=${DEFAULT_QZONE}&data=`;
       return `CONCATENATE(\n  "https://api.qrserver.com/v1/create-qr-code/?${params}",\n  ENCODEURL([${columnName}])\n)`;
     }
-    return `CONCATENATE(\n  "https://barcodeapi.org/api/128/",\n  ENCODEURL([${columnName}])\n)`;
+   return `CONCATENATE(
+  "https://barcodeapi.org/api/128/",
+  ENCODEURL([${columnName}])
+)`;
   }
 
   function syntaxHighlight(formula){
