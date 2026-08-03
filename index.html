@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Welcome to Joe Tayatac — Generate a QR Code Formula for AppSheet</title>
-<meta name="description" content="Generate a QR code for your AppSheet app. Pick a color and size, then copy a ready-made formula.">
+<title>QR & Barcode Generator for AppSheet — by Joe Tayatac</title>
+<meta name="description" content="Generate a QR code or barcode formula for your AppSheet app. Pick a type, color, and size, then copy a ready-made formula.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -225,6 +225,34 @@
   }
   .size-readout{ font-family:'IBM Plex Mono', monospace; font-size:13px; color: var(--cyan); }
 
+  /* ---------- FORMAT TABS ---------- */
+  .tabs{
+    display:flex; gap:4px;
+    margin-bottom: 24px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 4px;
+    width: fit-content;
+  }
+  .tab-btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    background: transparent;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .tab-btn:hover{ color: var(--text); }
+  .tab-btn.active{
+    background: var(--red);
+    color: #fff;
+  }
+  .qr-only.hidden, .barcode-only.hidden{ display:none !important; }
+
   /* ---------- VIEWFINDER (QR preview) ---------- */
   .viewfinder-outer{
     position: sticky; top: 96px;
@@ -396,7 +424,7 @@
 
 <header class="top">
   <div class="wrap topbar">
-    <div class="logo"><span class="finder"></span>QR<span class="slash">&nbsp;//&nbsp;</span>GEN</div>
+    <div class="logo"><span class="finder"></span>QR<span class="slash">&nbsp;//&nbsp;</span>BARCODE</div>
   </div>
 </header>
 
@@ -404,9 +432,14 @@
 
   <section class="hero" id="generate">
     <div class="hero-left">
-      <h1 class="headline">Welcome to Joe Tayatac</h1>
-      <p class="sub" style="font-size:18px; color:var(--text); margin-bottom:8px;">Generate a QR code for your AppSheet app.</p>
-      <p class="sub">Type your column name, pick a color and a size, then copy the ready-made formula at the bottom of the page and paste it into your AppSheet column.</p>
+      <h1 class="headline">QR & Barcode Generator</h1>
+      <p class="sub" style="font-size:18px; color:var(--text); margin-bottom:8px;" id="pageIntro">Generate a QR code or barcode for your AppSheet app.</p>
+      <p class="sub" id="pageSub">Pick a type, fill in your column name, then copy the ready-made formula at the bottom of the page and paste it into your AppSheet column.</p>
+
+      <div class="tabs" role="tablist">
+        <button class="tab-btn active" id="tabQr" role="tab" aria-selected="true">QR Code</button>
+        <button class="tab-btn" id="tabBarcode" role="tab" aria-selected="false">Barcode</button>
+      </div>
 
       <div class="controls">
         <div class="field">
@@ -414,7 +447,7 @@
           <input type="text" id="data" value="Vehicle No" placeholder="e.g. Vehicle No">
         </div>
 
-        <div class="row">
+        <div class="row qr-only">
           <div class="field">
             <label for="fg">Foreground</label>
             <div class="swatch-row">
@@ -431,10 +464,22 @@
           </div>
         </div>
 
-        <div class="row">
+        <div class="row qr-only">
           <div class="field">
             <label for="size">Size <span class="size-readout" id="sizeReadout">300 × 300 px</span></label>
             <input type="range" id="size" min="100" max="600" step="10" value="300">
+          </div>
+        </div>
+
+        <div class="row barcode-only hidden">
+          <div class="field">
+            <label for="barcodeType">Barcode type</label>
+            <select id="barcodeType">
+              <option value="128">Code 128 (general purpose)</option>
+              <option value="39">Code 39</option>
+              <option value="13">EAN-13</option>
+              <option value="upca">UPC-A</option>
+            </select>
           </div>
         </div>
       </div>
@@ -448,11 +493,11 @@
           <span class="bracket bl"></span>
           <span class="scanline"></span>
           <div class="qr-img-wrap">
-            <img id="qrPreview" src="" alt="Live QR code preview" width="220" height="220">
+            <img id="qrPreview" src="" alt="Live code preview" width="220" height="220">
           </div>
         </div>
         <div class="viewfinder-caption">
-          <span>QR preview</span>
+          <span id="previewLabel">QR preview</span>
           <span class="status" id="statusText">Ready</span>
         </div>
       </div>
@@ -483,7 +528,7 @@
   <section class="reference" id="reference">
     <div class="section-label"><span class="mark"></span>Parameter reference</div>
     <div class="ref-wrap">
-      <table class="ref-table">
+      <table class="ref-table qr-only">
         <thead>
           <tr><th>Param</th><th>Controls</th><th>Accepted values</th></tr>
         </thead>
@@ -494,6 +539,15 @@
           <tr><td class="param">bgcolor</td><td class="desc">Background color</td><td class="vals">hex, no # — e.g. ffffff</td></tr>
         </tbody>
       </table>
+      <table class="ref-table barcode-only hidden">
+        <thead>
+          <tr><th>Param</th><th>Controls</th><th>Accepted values</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="param">data</td><td class="desc">The column whose value becomes the barcode</td><td class="vals">your AppSheet column name</td></tr>
+          <tr><td class="param">type</td><td class="desc">Barcode symbology</td><td class="vals">128, 39, EAN-13, UPC-A</td></tr>
+        </tbody>
+      </table>
     </div>
   </section>
 
@@ -501,7 +555,7 @@
 
 <footer>
   <div class="wrap footer-row">
-    <span>QR CODE EXPRESSION // GENERATOR — a live QR image endpoint</span>
+    <span>QR &amp; BARCODE // GENERATOR — live QR and barcode image endpoints</span>
     <span class="mono">built for AppSheet · joetayactac.github.io/qrcode</span>
   </div>
 </footer>
@@ -514,38 +568,80 @@
   const bgHex = document.getElementById('bgHex');
   const size = document.getElementById('size');
   const sizeReadout = document.getElementById('sizeReadout');
+  const barcodeType = document.getElementById('barcodeType');
   const qrPreview = document.getElementById('qrPreview');
   const statusText = document.getElementById('statusText');
+  const previewLabel = document.getElementById('previewLabel');
   const formulaOutput = document.getElementById('formulaOutput');
   const copyBtn = document.getElementById('copyBtn');
+  const tabQr = document.getElementById('tabQr');
+  const tabBarcode = document.getElementById('tabBarcode');
+  const pageIntro = document.getElementById('pageIntro');
+  const pageSub = document.getElementById('pageSub');
 
-  const BASE = 'https://api.qrserver.com/v1/create-qr-code/';
+  const QR_BASE = 'https://api.qrserver.com/v1/create-qr-code/';
+  const BARCODE_BASE = 'https://barcodeapi.org/api';
 
   // Fixed, sensible defaults — not shown in the form since most people
   // never need to change these.
   const DEFAULT_ECC = 'L';
   const DEFAULT_QZONE = '1';
 
+  let format = 'qr'; // 'qr' | 'barcode'
+
   function stripHash(hex){ return hex.replace('#',''); }
 
+  function setFormat(next){
+    format = next;
+    const isQr = format === 'qr';
+
+    tabQr.classList.toggle('active', isQr);
+    tabBarcode.classList.toggle('active', !isQr);
+    tabQr.setAttribute('aria-selected', isQr);
+    tabBarcode.setAttribute('aria-selected', !isQr);
+
+    document.querySelectorAll('.qr-only').forEach(el => el.classList.toggle('hidden', !isQr));
+    document.querySelectorAll('.barcode-only').forEach(el => el.classList.toggle('hidden', isQr));
+
+    previewLabel.textContent = isQr ? 'QR preview' : 'Barcode preview';
+    pageIntro.textContent = isQr
+      ? 'Generate a QR code for your AppSheet app.'
+      : 'Generate a barcode for your AppSheet app.';
+    pageSub.textContent = isQr
+      ? 'Type your column name, pick a color and a size, then copy the ready-made formula at the bottom of the page and paste it into your AppSheet column.'
+      : 'Type your column name, pick a barcode type, then copy the ready-made formula at the bottom of the page and paste it into your AppSheet column.';
+
+    syncUrl();
+    refresh();
+  }
+
   function buildImageUrl(){
-    const s = size.value;
-    const params = new URLSearchParams({
-      size: `${s}x${s}`,
-      color: stripHash(fg.value),
-      bgcolor: stripHash(bg.value),
-      ecc: DEFAULT_ECC,
-      qzone: DEFAULT_QZONE,
-      data: dataInput.value || ' '
-    });
-    return `${BASE}?${params.toString()}`;
+    if (format === 'qr'){
+      const s = size.value;
+      const params = new URLSearchParams({
+        size: `${s}x${s}`,
+        color: stripHash(fg.value),
+        bgcolor: stripHash(bg.value),
+        ecc: DEFAULT_ECC,
+        qzone: DEFAULT_QZONE,
+        data: dataInput.value || ' '
+      });
+      return `${QR_BASE}?${params.toString()}`;
+    }
+    const type = barcodeType.value;
+    const value = encodeURIComponent(dataInput.value || 'SAMPLE123');
+    return `${BARCODE_BASE}/${type}/${value}`;
   }
 
   function buildFormula(){
-    const s = size.value;
-    const params = `size=${s}x${s}&color=${stripHash(fg.value)}&bgcolor=${stripHash(bg.value)}&ecc=${DEFAULT_ECC}&qzone=${DEFAULT_QZONE}&data=`;
     const columnName = (dataInput.value || 'ReferenceColumn').trim();
-    return `CONCATENATE(\n  "https://api.qrserver.com/v1/create-qr-code/?${params}",\n  ENCODEURL([${columnName}])\n)`;
+    if (format === 'qr'){
+      const s = size.value;
+      const params = `size=${s}x${s}&color=${stripHash(fg.value)}&bgcolor=${stripHash(bg.value)}&ecc=${DEFAULT_ECC}&qzone=${DEFAULT_QZONE}&data=`;
+      return `CONCATENATE(\n  "https://api.qrserver.com/v1/create-qr-code/?${params}",\n  ENCODEURL([${columnName}])\n)`;
+    }
+    const type = barcodeType.value;
+    return `CONCATENATE(\n  "https://barcodeapi.org/api/${type}/",\n  ENCODEURL([${columnName}])\n)`;
   }
 
   function syntaxHighlight(formula){
@@ -556,10 +652,14 @@
   }
 
   // ---- URL param sync ----
-  // Reads ?data=&color=&bgcolor=&size= on load, and keeps the address bar
-  // in sync as settings change, so a configured link is shareable.
+  // Reads ?format=&data=&color=&bgcolor=&size=&barcodeType= on load, and
+  // keeps the address bar in sync as settings change, so a configured
+  // link is shareable.
   function loadFromUrl(){
     const p = new URLSearchParams(window.location.search);
+    if (p.has('format') && (p.get('format') === 'qr' || p.get('format') === 'barcode')){
+      format = p.get('format');
+    }
     if (p.has('data')) dataInput.value = p.get('data');
     if (p.has('color')) fg.value = normalizeHex(p.get('color'));
     if (p.has('bgcolor')) bg.value = normalizeHex(p.get('bgcolor'));
@@ -567,6 +667,7 @@
       const s = parseInt(p.get('size'), 10);
       if (!isNaN(s)) size.value = Math.min(600, Math.max(100, s));
     }
+    if (p.has('barcodeType')) barcodeType.value = p.get('barcodeType');
   }
 
   function normalizeHex(v){
@@ -576,10 +677,12 @@
 
   function syncUrl(){
     const params = new URLSearchParams({
+      format: format,
       data: dataInput.value || '',
       color: stripHash(fg.value),
       bgcolor: stripHash(bg.value),
-      size: size.value
+      size: size.value,
+      barcodeType: barcodeType.value
     });
     const newUrl = `${window.location.pathname}?${params.toString()}`;
     window.history.replaceState({}, '', newUrl);
@@ -603,9 +706,12 @@
   qrPreview.addEventListener('load', () => { statusText.textContent = 'Ready'; });
   qrPreview.addEventListener('error', () => { statusText.textContent = 'Connection issue'; });
 
-  [dataInput, fg, bg, size].forEach(el => {
+  [dataInput, fg, bg, size, barcodeType].forEach(el => {
     el.addEventListener('input', refresh);
   });
+
+  tabQr.addEventListener('click', () => setFormat('qr'));
+  tabBarcode.addEventListener('click', () => setFormat('barcode'));
 
   copyBtn.addEventListener('click', () => {
     navigator.clipboard.writeText(buildFormula()).then(() => {
@@ -620,15 +726,15 @@
 
   document.querySelectorAll('.donate-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      fetch('https://api.countapi.xyz/hit/joetayactac-qrcode/coffee_clicks').catch(() => {});
+      fetch('https://countapi.mileshilliard.com/api/v1/hit/joetayactac_qrcode_coffee_clicks').catch(() => {});
     });
   });
 
   loadFromUrl();
-  refresh();
+  setFormat(format);
 
-  // Simple, no-signup visit counter (CountAPI). Fails silently if offline/blocked.
-  fetch('https://api.countapi.xyz/hit/joetayactac-qrcode/visits').catch(() => {});
+  // Simple, no-signup visit counter. Fails silently if offline/blocked.
+  fetch('https://countapi.mileshilliard.com/api/v1/hit/joetayactac_qrcode_visits').catch(() => {});
 </script>
 
 </body>
